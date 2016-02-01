@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+  <head>
+    <title>The Web Is...</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<!--
+# The Web Is...
+
+## An article within a web page
+
+With this site, we thought we'd try something new. The web to us is an extremely powerful resource for educating, if it weren't for 'view source' a lot of us would never have had the urge to start designing and developing our own sites. With that in mind we have put together a full article to explain the goals and process involved in making this site.
+
+When planning the site we thought, could a graphically rich site both look great and also be incredibly fast and lightweight? With that goal, the plan evolved that we would create a site using only HTML, CSS and entirely encapsulated in one single page request. A challenge, but read on and we'll go through each step.
+
+## What we'll cover
+
+The plan is to step through the HTML of this web site, and along the way discuss some of the work that went into each part. Along the way we'll cover how to set up a Grunt.js workflow, how to embed custom fonts on a page, working with CSS transforms, and even a little bit of vanilla JavaScript.
+
+## Why one request?
+
+When a website loads, it makes lots of "requests" to one or more servers for each of the components of the page. These requests could be for stylesheets, images, script files and much more. Every time your browser makes such a request, it takes a small amount of time to set up the back-and-forth necessary to explain to the server what it's asking for. These small moments may be insignificant by themselves but if you have many of them happening, the result is that the page feels slower.
+
+In this case we want to build a single page website that is as fast as we can make it, so to try to maximise the speed we'll put everything into one file, with one page request.
+
+Let's get started!
+
+## Head first
+
+We begin with the standard HTML5-style boilerplate. Inside the head of the page, we have the usual `title` tag. We then set some meta data. `Viewport` is a setting that tells mobile devices how much to zoom when the page is first loaded. We could use this to lock the zooming at a certain scale but doing that can make the site less accessible.
+
+Next, we move on to styles.
+
+## Inline styles
+
+As part of the mission to reduce page requests, we're putting all the styles into the document. Generally, as a rule, I'd recommend include styles in a separate stylesheet. The single extra page request is more than made up for by the advantage of letting the browser cache the file, so that it isn't downloaded again when used on other pages.
+
+We will step through these styles and describe them.
+
+-->
+    <style>
+      @charset 'UTF-8';
+
+      /* ### Reset
+       *
+       * Before doing anything else, we're making use of an abridged version of Eric Meyer's [Reset CSS](http://meyerweb.com/eric/tools/css/reset/). This is a handy, and quite succinct way to set some sensible default values for elements that ensure they'll look consistent across multiple browsers. */
+
+      html,
+      body,
+      div,
+      span,
+      h1,
+      h2,
+      h3,
+      p,
+      a,
+      em,
+      img,
+      strong,
+      form,
+      article,
+      aside,
+      footer,
+      header,
+      nav,
+      section {
+        font: inherit;
+        font-size: 100%;
+        margin: 0;
+        padding: 0;
+        vertical-align: baseline;
+        border: 0;
+      }
+
+      /* For HTML5 compatibility, tell the browsers that these fancy new tags should be shown. */
+
+      article,
+      aside,
+      figcaption,
+      figure,
+      footer,
+      header,
+      menu,
+      nav,
+      section {
+        display: block;
+      }
+
+      /* ### Body tag
+       *
+       * The body tag is where we'll add some settings that cascade down through other elements and impact how they look. We're setting the font-size in pixels here, but in the rest of the CSS we'll use `em`. Since the em value (the width of the letter "m") is dependant on this size, the pixel based font-size here acts as an anchor to the overall size of all the elements on the page.
+       *
+       * To add a bit of style to the page we're using some CSS animation. */
+
+      body {
+        font-family: 'Open Sans Condensed', sans-serif;
+        font-size: 16px;
+        line-height: 1;
+        -webkit-animation: fade-in 2s forwards;
+                animation: fade-in 2s forwards;
+        opacity: 0;
+        background: -webkit-linear-gradient(top, white, #eed 30em);
+        background:         linear-gradient(to bottom, white, #eed 30em);
+        background-color: #eed;
+        background-repeat: no-repeat;
+      }
+
+      /* ### CSS Animation
+       *
+       * In CSS, you can animate elements on the page in all sorts of ways. They can be transitioned between any number of states to make quite complex animations. Creating an animation involves two steps. The first is to add an `animation` property to the element being animated.
+       *
+       * In the example above I've set the animation property to run the `fade-in` animation for 2 seconds. The `forwards` value instructs the animation to only play once.
+       *
+       * Next, we create set of `keyframes` that describe what the animation does. Keyframes are a series of steps that describe each "step" and the browser will transition between each. Our example looks like this: */
+
+      @-webkit-keyframes fade-in {
+        0% {
+          opacity: 0;
+        }
+
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fade-in {
+        0% {
+          opacity: 0;
+        }
+
+        100% {
+          opacity: 1;
+        }
+      }
+
+      /* Keyframes are shown as a percentage, indicating how far through the animation each keyframe is. In this case it begins with an `opacity` of zero, and ends totally opaque. */
+
+      /* ### Creating a 3D object using CSS transforms
+       *
+       * The main feature of the site is the Mac Plus computer, created entirely using HTML and CSS. For a more comprehensive article on how this is created, see hop.ie/blog/macplus. For now we'll go through each part of the CSS and briefly explain what it does.
+       *
+       * Let's begin by setting the stage. */
+
+      .stage {
+        font-size: 42px;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        height: 38em;
+
+        -webkit-perspective: 1200px;
+                perspective: 1200px;
+        -webkit-perspective-origin: 50% 7em;
+                perspective-origin: 50% 7em;
+      }
+
+      /* The main thing to point out here is the use of `perspective` and `perspective-origin`. The element with class "stage" is a container that we'll build a 3D model inside, and in order to do that we tell the browser as much. The `perspective` setting is like the 3D depth of the scene, with lower values creating more dramatic angles, and a larger value creating a deeper scene with more gently angles. */
+
+      .positioning-start,
+      .positioning,
+      .positioning-active {
+        position: absolute;
+        top: 1.5em;
+        left: 50%;
+        width: 12em;
+        margin-left: -5em;
+        -webkit-transition: -webkit-transform 1.6s;
+                transition:         transform 1.6s;
+       -webkit-transform: rotateY(-20deg);
+               transform: rotateY(-20deg);
+
+        -webkit-transform-style: preserve-3d;
+                transform-style: preserve-3d;
+      }
+
+      /* Another thing to note is the use of `transform-style`. This property, when set to `preserve-3d`, tells the browser that any 3D transforms should act according to the `perspective` value we set in the parent element. With this set, we can apply animations or transitions that use CSS `transforms` to rotate the element.
+       *
+       * In this case, the "positioning" element is a container I'm using to contain the Mac Plus, and I'm adding some variations which I'll adjust on the fly using JavaScript later. Moving on... */
+
+      .positioning-start {
+        -webkit-animation: introduce 5s forwards linear;
+                animation: introduce 5s forwards linear;
+        -webkit-animation-delay: 2s;
+                animation-delay: 2s;
+        opacity: 0;
+      }
+
+      .positioning-start .mac .screen {
+        background: #222;
+      }
+
+      .positioning-active {
+        -webkit-transition: -webkit-transform .6s;
+                transition:         transform .6s;
+       -webkit-transform: rotateX(-5deg) translateZ(6em) translateY(-1em);
+               transform: rotateX(-5deg) translateZ(6em) translateY(-1em);
+      }
+
+      .positioning-active .mac .screen,
+      .positioning-active span.subscribe-message {
+        -webkit-animation: none;
+                animation: none;
+      }
+
+      .positioning-active .mac .screen {
+        background: #023d52;
+      }
+
+      /* Here we begin to describe the styles for the Mac Plus. We're using `em` for all dimensions here, so if we were to change the body's `font-size` value, everything will scale.
+       *
+       * The Mac Plus is made up of two boxes, one that sits on top and is tilted back a little, and a second cube that sits underneath to act as a base.
+       *
+       * Each of these boxes is made up of flat `span` elements positioned using CSS `transforms`. For a more detailed overview of the steps involved, see [the Mac Plus blog post](http://hop.ie/blog/macplus). */
+
+      .mac {
+        width: 12em;
+        height: 10em;
+        margin: 1.5em auto 0;
+
+        -webkit-transform-style: preserve-3d;
+                transform-style: preserve-3d;
+        /* Since the Mac Plus is made up of lots of `span` elements, we save time by declaring some properties that will apply to all `spans`.
+         *
+         * Next we go through each of the parts. Each of these is represented by a `span` in the HTML, which we'll see later.
+         *
+         * The front is the first one. It's given a height and width, background color and then moved into place using transforms.
+         *
+         * ### Transformation
+         *
+         * CSS contains properties that allow us to move our HTML elements around. We can rotate them, skew them, and even position them within a 3D space. It gets really interesting when we add in CSS animation to create some impressive effects.
+         *
+         * In this case the transform rule tilts the screen back a little, and then moves it forward (toward us) by 5.43em. */
+        /* Something else to point out here, is the use of borders. The front of the Mac Plus has bevelled edges. In the article on hop.ie, I made use of extra HTML elements to create these edges, but it's not necessary. When borders with different colours meet, they meet at an angle that looks similar to the bevelled effect. */
+        /* We then create the effect of an inset screen on the front. The container has rounded corners and a gradient to imply shadow. The `linear-gradient` in the background creates this effect. */
+        /* The various other parts of the Mac Plus are positioned and styled in a similar way. */
+      }
+
+      .mac span {
+        position: absolute;
+        display: block;
+        opacity: 1;
+
+        -webkit-backface-visibility: visible;
+                backface-visibility: visible;
+      }
+
+      .mac .front {
+        -moz-box-sizing: border-box;
+             box-sizing: border-box;
+        width: 9.6em;
+        height: 11.5em;
+        -webkit-transform: rotateX(5deg) translateZ(5.43em);
+                transform: rotateX(5deg) translateZ(5.43em);
+        border-top: .75em solid #e1e1e1;
+        border-right: .5em solid #c8c8c8;
+        border-bottom: .75em solid #bbb;
+        border-left: .5em solid #c8c8c8;
+        background: #cfcfcf;
+      }
+
+      .mac .screen-container {
+        width: 6.25em;
+        height: 4.8em;
+        padding: .5em;
+        -webkit-transform: translate(.65em, .75em);
+                transform: translate(.65em, .75em);
+        border-radius: .1em;
+        background: #b1b1b1;
+        background: -webkit-linear-gradient(top, #a2a2a2, #bbb 4%, #bbb 96%, #959595);
+        background:         linear-gradient(to bottom, #a2a2a2, #bbb 4%, #bbb 96%, #959595);
+      }
+
+      .mac .screen {
+        position: absolute;
+        top: .25em;
+        left: .25em;
+        display: block;
+        overflow: hidden;
+        width: 6.25em;
+        height: 4.75em;
+        -webkit-animation: introduce-screen .5s forwards linear;
+                animation: introduce-screen .5s forwards linear;
+        -webkit-animation-delay: 7.5s;
+                animation-delay: 7.5s;
+        border: .25em solid #222;
+        border-radius: .25em;
+        background: #023d52;
+        /* Within the screen container, the screen itself lives. We're going to animate the screen, with the background color of the screen beginning darker, then lighting as the screen becomes active. To achieve this, an `animation` property is used. The `introduce-screen` animation contains the color change.
+         *
+         * We also use the `animation-delay` property. This defers the animation start time by a value that can be set in milliseconds or seconds. In this case, the screen is set to switch on after 7.5 seconds. */
+        /* More animation here. This time we have a smiley face created using a monospaced font and the solid block character (█). You may notice that the `animation` tag is used differently, in that it now contains 2 animations. Animations can be stacked and have different delays. In this case, the animation to show the smiley starts after one second and the animation to hide the smiley starts at 7 seconds.
+         *
+         * The result is the smiley showing while the screen is off (or loading), then it vanishes before the main screen content is shown. */
+        /* The welcome message is contained in a span that we'll fill using JavaScript later. One thing to note is the use of a `psueo-element`, "after". The "after" (and "before") pseudo-elements are used to insert content to an element before or after the existing content, without resorting to JavaScript. In this case, we have a bar character that will sit after any text.
+         *
+         * The bar character has it's own "flash" animation, which will look infinitely, making it look more like a cursor. */
+      }
+
+      .mac .screen pre.smiley {
+        font-family: 'Lucida Console', Monaco, Courier, monospace;
+        font-size: .2em;
+        line-height: .75em;
+        position: absolute;
+        -webkit-animation: introduce-smiley 4s forwards ease-out, hide-smiley .5s ease-out forwards;
+                animation: introduce-smiley 4s forwards ease-out, hide-smiley .5s ease-out forwards;
+        -webkit-animation-delay: 1s, 7s;
+                animation-delay: 1s, 7s;
+        opacity: 0;
+        color: #eed;
+      }
+
+      .mac .screen span.welcome-message,
+      .mac .screen span.subscribe-message {
+        font-family: 'Lucida Console', Monaco, monospace;
+        font-size: .38em;
+        line-height: 1.25em;
+        position: absolute;
+        display: none;
+        padding: .25em;
+        -webkit-animation: fade-in .5s ease-out forwards linear;
+                animation: fade-in .5s ease-out forwards linear;
+        -webkit-animation-delay: 5.5s;
+                animation-delay: 5.5s;
+        color: white;
+      }
+
+      .mac .screen span.welcome-message.show,
+      .mac .screen span.subscribe-message.show {
+        display: block;
+      }
+
+      .mac .screen span.welcome-message:after {
+        content: '|';
+        -webkit-animation: flash 1.5s infinite linear;
+                animation: flash 1.5s infinite linear;
+      }
+
+      .mac .screen span.subscribe-message input[type=email] {
+        width: 65%;
+        color: white;
+        border: none;
+        border-bottom: 1px solid white;
+        outline: none;
+        background: rgba(255, 255, 255, .03);
+      }
+
+      .mac .screen span.subscribe-message input[type=submit] {
+        cursor: pointer;
+        color: #023d52;
+        border: none;
+        outline: none;
+        background: white;
+      }
+
+      .mac .sheen {
+        position: absolute;
+        top: 0;
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: -webkit-linear-gradient(top right, rgba(255, 255, 255, .03), rgba(255, 255, 255, .06) 50%, transparent 50%, transparent);
+        background:         linear-gradient(to bottom left, rgba(255, 255, 255, .03), rgba(255, 255, 255, .06) 50%, transparent 50%, transparent);
+      }
+
+      .mac .top {
+        width: 9.6em;
+        height: 10.95em;
+        -webkit-transform: rotateX(5deg) rotateX(90deg) translateZ(5.45em);
+                transform: rotateX(5deg) rotateX(90deg) translateZ(5.45em);
+        background: -webkit-linear-gradient(top, #e1e1e1, #c8c8c8 .25em, #a2a2a2);
+        background:         linear-gradient(to bottom, #e1e1e1, #c8c8c8 .25em, #a2a2a2);
+        background-color: #ebf0dc;
+      }
+
+      .mac .left {
+        width: 10.9em;
+        height: 11.5em;
+        -webkit-transform: rotateX(5deg) rotateY(-90deg) translateZ(5.45em);
+                transform: rotateX(5deg) rotateY(-90deg) translateZ(5.45em);
+        background: -webkit-linear-gradient(top, #eee, #cfcfcf .25em, #a2a2a2);
+        background:         linear-gradient(to bottom, #eee, #cfcfcf .25em, #a2a2a2);
+      }
+
+      .mac .left:after {
+        position: absolute;
+        top: 11.4em;
+        left: .5em;
+        width: 8.9em;
+        height: 1em;
+        content: '';
+        -webkit-transform: rotateZ(5deg);
+                transform: rotateZ(5deg);
+        background: -webkit-linear-gradient(top, rgba(100, 100, 100, .8), rgba(100, 100, 100, .8) 30%, transparent 30%, transparent);
+        background:         linear-gradient(to bottom, rgba(100, 100, 100, .8), rgba(100, 100, 100, .8) 30%, transparent 30%, transparent);
+        background-size: 2em;
+      }
+
+      .mac .right {
+        width: 10.9em;
+        height: 11.5em;
+        -webkit-transform: rotateX(5deg) rotateY(90deg) translateZ(4.14em);
+                transform: rotateX(5deg) rotateY(90deg) translateZ(4.14em);
+        background: -webkit-linear-gradient(top, #eee, #cfcfcf .25em, #a2a2a2);
+        background:         linear-gradient(to bottom, #eee, #cfcfcf .25em, #a2a2a2);
+      }
+
+      .mac .right:after {
+        position: absolute;
+        top: 11.4em;
+        right: .5em;
+        width: 8.9em;
+        height: 1em;
+        content: '';
+        -webkit-transform: rotateZ(-5deg);
+                transform: rotateZ(-5deg);
+        background: -webkit-linear-gradient(top, rgba(100, 100, 100, .8), rgba(100, 100, 100, .8) 30%, transparent 30%, transparent);
+        background:         linear-gradient(to bottom, rgba(100, 100, 100, .8), rgba(100, 100, 100, .8) 30%, transparent 30%, transparent);
+        background-size: 2em;
+      }
+
+      .mac .base-front {
+        width: 9.6em;
+        height: 2.1em;
+        -webkit-transform: translateY(10.7em) translateZ(5em);
+                transform: translateY(10.7em) translateZ(5em);
+        background: #b1b1b1;
+      }
+
+      .mac .base-front:after {
+        position: absolute;
+        top: .9em;
+        right: 1em;
+        display: block;
+        width: .4em;
+        height: .5em;
+        content: '';
+        border-top: .1em solid #a2a2a2;
+        border-right: .2em solid #bbb;
+        border-bottom: .1em solid #d4d4d4;
+        border-left: .2em solid #bbb;
+        border-radius: .12em;
+        background: #555;
+      }
+
+      .mac .base-left {
+        width: 10em;
+        height: 2.1em;
+        -webkit-transform: translateY(10.7em) rotateY(-90deg) translateZ(4.99em);
+                transform: translateY(10.7em) rotateY(-90deg) translateZ(4.99em);
+        background: #a2a2a2;
+      }
+
+      .mac .base-right {
+        width: 10em;
+        height: 2.1em;
+        -webkit-transform: translateY(10.7em) rotateY(90deg) translateZ(4.58em);
+                transform: translateY(10.7em) rotateY(90deg) translateZ(4.58em);
+        background: #a2a2a2;
+      }
+
+      .mac .floppy {
+        width: 2.8em;
+        height: .2em;
+        -webkit-transform: translate(4.3em, 8.1em);
+                transform: translate(4.3em, 8.1em);
+        border-top: .1em solid #bbb;
+        border-right: .3em solid #d4d4d4;
+        border-bottom: .1em solid #e1e1e1;
+        border-left: .3em solid #d4d4d4;
+        border-radius: .25em;
+        background: #555;
+      }
+
+      .mac .shadow {
+        width: 10em;
+        height: 11em;
+        -webkit-transform: rotateX(90deg) translateZ(-7.4em) translateY(-20em);
+                transform: rotateX(90deg) translateZ(-7.4em) translateY(-20em);
+        background: transparent;
+        box-shadow: 0 20.2em 1.8em rgba(30, 20, 30, .2);
+      }
+
+      /* ### Text styling
+       *
+       * In order to keep the site light and fast, we're avoiding any CSS frameworks and only styling the tags we'll be using in the HTML. In this example we have just some headings, paragraphs, links and form elements. */
+
+      h2.subtitle {
+        font-size: .5em;
+        position: absolute;
+        top: 1.5em;
+        right: 2em;
+        -webkit-transition: all .25s;
+                transition: all .25s;
+        -webkit-transform: translateZ(.1em);
+                transform: translateZ(.1em);
+        -webkit-animation: fade-in 3s forwards;
+                animation: fade-in 3s forwards;
+        -webkit-animation-delay: 2s;
+                animation-delay: 2s;
+        text-transform: uppercase;
+        opacity: 0;
+        color: #444;
+      }
+
+      h2.subtitle a {
+        font-weight: bold;
+        color: #222;
+      }
+
+      p {
+        font-size: .75em;
+        font-weight: normal;
+        margin: .75em 0;
+      }
+
+      a {
+        text-decoration: none;
+        color: #22a;
+      }
+
+      h2,
+      h3 {
+        font-size: 2em;
+        margin: .25em 0;
+      }
+
+      h3 {
+        font-size: 1.25em;
+      }
+
+      .content form {
+        padding: .25em 0;
+      }
+
+      .content form input {
+        font-family: 'Open Sans Condensed', sans-serif;
+        font-size: .75em;
+        font-weight: normal;
+        width: 14em;
+        margin: .25em 0;
+        padding: .25em .5em;
+        border: 2px solid #558;
+        border-radius: .25em;
+        outline: none;
+        background-color: #eee;
+      }
+
+      .content form input:focus {
+        box-shadow: 0 0 0 2px #f90;
+      }
+
+      .content form input[type=submit] {
+        width: auto;
+        padding: .25em 1em;
+        color: white;
+        border: none;
+        background: #335;
+      }
+
+      .content form p {
+        margin-top: 0;
+      }
+
+      /* ## Logos
+       *
+       * In keeping with the aims to minimise the file size and page requests, we're using an SVG for the logo. SVG is an XML document that describes a vector image, different from a `png` or `jpg` image in that it consists of readible text. The SVG file itself is included in the HTML and positioned in the top-left of the page.
+       *
+       * ### Fallback
+       *
+       * For situations where the SVG is not useful, such as non-visual screen readers or older browsers, the HTML contains a heading at the top with class "logo". This contains text that is readible but also styled to show a background `png` file for older browsers that cannot display SVG. */
+
+      .svg-logo {
+        font-size: 42px;
+        position: absolute;
+        top: .75em;
+        left: .75em;
+        width: 3em;
+        height: 3em;
+        border: none;
+        border-radius: 50%;
+      }
+
+      .svg-logo:hover svg {
+        -webkit-transition: .4s ease-out;
+                transition: .4s ease-out;
+        -webkit-transform: rotateZ(-120deg);
+                transform: rotateZ(-120deg);
+      }
+
+      .svg-logo:hover span.hover-text {
+        -webkit-transition: all .3s;
+                transition: all .3s;
+        opacity: 1;
+      }
+
+      .svg-logo a {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+      }
+
+      .svg-logo a span.hover-text {
+        font-size: .45em;
+        position: absolute;
+        z-index: -1;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        -webkit-transition: all .4s;
+                transition: all .4s;
+        text-align: center;
+        opacity: 0;
+        color: #eee;
+        border-radius: 50%;
+        background-color: rgba(0, 0, 0, .9);
+        box-shadow: 0 0 40px rgba(100, 100, 80, .2) inset;
+      }
+
+      .svg-logo svg {
+        width: 100%;
+        height: 100%;
+        -webkit-transition: .3s ease-out;
+                transition: .3s ease-out;
+        -webkit-transform-origin: 0 50%;
+                transform-origin: 0 50%;
+      }
+
+      h1.logo {
+        display: none;
+      }
+
+      /* The fallback code here will only show the more basic logo in cases where the Modernizr script detects that the browser cannot display SVG. If the browser ignores CSS entirely, it will see the "The Web Is..." text at the beginning of the content. */
+
+      .no-inlinesvg h1.logo {
+        font-size: 42px;
+        position: absolute;
+        top: .75em;
+        left: .75em;
+        display: block;
+        width: 3em;
+        height: 3em;
+        text-indent: -9000px;
+        border-radius: 50%;
+        background: url(images/logo.png) no-repeat;
+        background-size: 100%;
+      }
+
+      .no-inlinesvg .svg-logo {
+        display: none;
+      }
+
+      /* With the general text and form element styles done, we then style some of the other page content. In this case, the "content" section is a part of the page that shows when the user scrolls down the page. Initially it is set to be invisible, and two animations are applied to the "show" and "hide" classes. These extra classes are added and removed by JavaScript later, based on how far down the page the reader has scrolled. */
+
+      .content {
+        position: absolute;
+        width: 100%;
+        padding: 4em 0 6em;
+        -webkit-transform-origin: 50% 0 0;
+                transform-origin: 50% 0 0;
+        text-align: center;
+        opacity: 0;
+        color: #222;
+        background-color: #99f;
+        background-color: rgba(100, 120, 150, .5);
+      }
+
+      .content.show {
+        -webkit-animation: show-content .5s ease-out forwards;
+                animation: show-content .5s ease-out forwards;
+      }
+
+      .content.hide {
+        -webkit-animation: hide-content .5s ease-out forwards;
+                animation: hide-content .5s ease-out forwards;
+      }
+
+      /* ## Pipes
+       *
+       * We then give the page some extra colour by creating background "pipes". Since we're doing a lot of 3D transforms already in the "stage" part of the page, we'll stick with some simpler border decoration to act as a background. We're using 3 divs here, each of which has a border and two `pseudo-elements` each with their own borders.
+       *
+       * We can adjust the positioning of these pseudo-elements to place their borders side-by-side and create the effect of 3 pipes running in parallel. */
+
+      .pipes-container {
+        position: absolute;
+        overflow: hidden;
+        width: 100%;
+        height: 68em;
+      }
+
+      .bg-pipes {
+        position: absolute;
+        width: 300%;
+        height: 40em;
+        -webkit-transform: translateX(15em) translateY(6em);
+                transform: translateX(15em) translateY(6em);
+        border: .5em solid #c33;
+        border-radius: 1.5em;
+      }
+
+      .bg-pipes:before {
+        position: absolute;
+        display: block;
+        width: 100%;
+        height: 39em;
+        content: '';
+        border: .5em solid #308e36;
+        border-radius: 1em 2em 2em 1em;
+      }
+
+      .bg-pipes:after {
+        position: absolute;
+        display: block;
+        width: 100%;
+        height: 38em;
+        margin: .5em -.5em -.5em .5em;
+        content: '';
+        border: .5em solid #3cc;
+        border-radius: .5em 1.5em 1.5em .5em;
+      }
+
+      .bg-pipe-2 {
+        -webkit-transform: translateX(-72%) translateY(16em);
+                transform: translateX(-72%) translateY(16em);
+      }
+
+      .bg-pipe-3 {
+        -webkit-transform: translateX(10em) translateY(22em);
+                transform: translateX(10em) translateY(22em);
+      }
+
+      /* ## Older browser fallbacks
+       *
+       * Since not all browsers support CSS transforms, we need to allow for this. We'll use Modernizr to detect whether the browser can handle the transforms. If not, it will add a "no-csstransforms3d" class to the `html` tag on the page.
+       *
+       * Since we can expect the class to be available only when the browser cannot support these styles, we'll make use of that to hide the complex stuff, and show an image instead. */
+
+      .no-csstransforms3d .positioning-start,
+      .no-csstransforms3d .positioning,
+      .no-csstransforms3d .bg-pipes {
+        display: none;
+      }
+
+      .no-csstransforms3d .stage {
+        position: relative;
+      }
+
+      .no-csstransforms3d .content {
+        margin-top: 600px;
+      }
+
+      .no-csstransforms3d .fallback-stage {
+        position: absolute;
+        top: 4em;
+        width: 100%;
+        height: 633px;
+        background: url(./images/mac.png) no-repeat center;
+      }
+
+      /* ## Getting responsive
+       *
+       * Responsive design could easily be a topic for a series of articles. In essence though, it can be considered a way of setting extra CSS rules that apply in specific contexts, such as screen sizes. In this case we're using a `@media` rule to serve some CSS that overrides the previous rules, and customizes the layout for smaller screens.
+       *
+       * These rules hide the logo and place the Mac Plus in the center of the screen, which will make the site easier for phone users to interact with it. */
+
+      @media only screen and (max-width: 568px) {
+        .stage {
+          font-size: 32px;
+          height: 18em;
+        }
+
+        h1.logo,
+        .svg-logo {
+          display: none;
+        }
+
+        h2.subtitle {
+          font-size: 12px;
+          top: 2.75em;
+          right: 1em;
+        }
+
+        .mac .top,
+        .mac .left,
+        .mac .right,
+        .mac .bottom {
+          display: none;
+        }
+
+        .mac .base-front,
+        .mac .base-left,
+        .mac .base-right,
+        .mac .shadow {
+          display: none;
+        }
+
+        .mac .screen {
+          -webkit-animation-delay: 1.5s;
+                  animation-delay: 1.5s;
+        }
+
+        .mac pre.smiley {
+          display: none;
+          -webkit-animation: none;
+                  animation: none;
+        }
+
+        .positioning-start,
+        .positioning,
+        .positioning-active {
+          -webkit-transform: none;
+                  transform: none;
+          -webkit-animation: none;
+                  animation: none;
+          opacity: 1;
+        }
+
+        .bg-pipe-1 {
+          -webkit-transform: translateZ(-50em) translateX(-20em) translateY(-2em);
+                  transform: translateZ(-50em) translateX(-20em) translateY(-2em);
+        }
+      }
+
+      /* As well as making the screen different for small screens, it is possible to do the opposite and customize our styles for large screens. This is a simple override, it simply sets the `font-size` in the "stage" to be 60 pixels, as opposed to 42. Since everything within the "stage" is specified in `em`, the Mac Plus and its content is scaled up also. */
+
+      @media only screen and (max-width: 768px) {
+        .svg-logo,
+        h1.logo {
+          font-size: 28px;
+        }
+      }
+
+      @media only screen and (min-width: 1400px) and (min-height: 899px) {
+        .stage {
+          font-size: 60px;
+        }
+      }
+
+      /* ## Animation
+       *
+       * Following from the `keyframes` we covered earlier, we have some more complex animations that cover the various bits that need animated on the page. For example, `introduce` is a series of steps that "walks" the Mac Plus onto the screen. The others cover things like fading content. */
+
+      @-webkit-keyframes introduce {
+        0%, 5% {
+          -webkit-transform: translate3d(0, 0, -30em) scaleY(2);
+                  transform: translate3d(0, 0, -30em) scaleY(2);
+        }
+
+        8%, 50% {
+          -webkit-transform: translate3d(0, 0, -30em) scaleY(1);
+                  transform: translate3d(0, 0, -30em) scaleY(1);
+          opacity: 1;
+        }
+
+        52%, 55% {
+          -webkit-transform: translate3d(0, 0, -26em) rotateY(-20deg);
+                  transform: translate3d(0, 0, -26em) rotateY(-20deg);
+          opacity: 1;
+        }
+
+        57%, 76% {
+          -webkit-transform: translate3d(0, 0, -26em) rotateY(20deg);
+                  transform: translate3d(0, 0, -26em) rotateY(20deg);
+          opacity: 1;
+        }
+
+        78%, 84% {
+          -webkit-transform: translate3d(0, 0, -20em) rotateY(-10deg);
+                  transform: translate3d(0, 0, -20em) rotateY(-10deg);
+          -webkit-animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+                  animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+          opacity: 1;
+        }
+
+        86%, 92% {
+          -webkit-transform: translate3d(0, 0, -10em) rotateY(10deg);
+                  transform: translate3d(0, 0, -10em) rotateY(10deg);
+          -webkit-animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+                  animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+          opacity: 1;
+        }
+
+        94%, 100% {
+          -webkit-transform: translate3d(0, 0, 0) rotateY(-20deg);
+                  transform: translate3d(0, 0, 0) rotateY(-20deg);
+          -webkit-animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+                  animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+          opacity: 1;
+        }
+      }
+
+      @keyframes introduce {
+        0%, 5% {
+          -webkit-transform: translate3d(0, 0, -30em) scaleY(2);
+                  transform: translate3d(0, 0, -30em) scaleY(2);
+        }
+
+        8%, 50% {
+          -webkit-transform: translate3d(0, 0, -30em) scaleY(1);
+                  transform: translate3d(0, 0, -30em) scaleY(1);
+          opacity: 1;
+        }
+
+        52%, 55% {
+          -webkit-transform: translate3d(0, 0, -26em) rotateY(-20deg);
+                  transform: translate3d(0, 0, -26em) rotateY(-20deg);
+          opacity: 1;
+        }
+
+        57%, 76% {
+          -webkit-transform: translate3d(0, 0, -26em) rotateY(20deg);
+                  transform: translate3d(0, 0, -26em) rotateY(20deg);
+          opacity: 1;
+        }
+
+        78%, 84% {
+          -webkit-transform: translate3d(0, 0, -20em) rotateY(-10deg);
+                  transform: translate3d(0, 0, -20em) rotateY(-10deg);
+          -webkit-animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+                  animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+          opacity: 1;
+        }
+
+        86%, 92% {
+          -webkit-transform: translate3d(0, 0, -10em) rotateY(10deg);
+                  transform: translate3d(0, 0, -10em) rotateY(10deg);
+          -webkit-animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+                  animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+          opacity: 1;
+        }
+
+        94%, 100% {
+          -webkit-transform: translate3d(0, 0, 0) rotateY(-20deg);
+                  transform: translate3d(0, 0, 0) rotateY(-20deg);
+          -webkit-animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+                  animation-timing-function: cubic-bezier(.96, 1.1, .95, 1);
+          opacity: 1;
+        }
+      }
+
+      @-webkit-keyframes introduce-smiley {
+        0%, 50% {
+          opacity: 0;
+        }
+
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes introduce-smiley {
+        0%, 50% {
+          opacity: 0;
+        }
+
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @-webkit-keyframes hide-smiley {
+        0%, 80% {
+          opacity: 1;
+        }
+
+        88%, 100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes hide-smiley {
+        0%, 80% {
+          opacity: 1;
+        }
+
+        88%, 100% {
+          opacity: 0;
+        }
+      }
+
+      @-webkit-keyframes fade-out {
+        0% {
+          opacity: 1;
+        }
+
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @keyframes fade-out {
+        0% {
+          opacity: 1;
+        }
+
+        100% {
+          opacity: 0;
+        }
+      }
+
+      @-webkit-keyframes introduce-screen {
+        0% {
+          background-color: #222;
+        }
+
+        100% {
+          background-color: #023d52;
+        }
+      }
+
+      @keyframes introduce-screen {
+        0% {
+          background-color: #222;
+        }
+
+        100% {
+          background-color: #023d52;
+        }
+      }
+
+      @-webkit-keyframes flash {
+        0% {
+          opacity: 0;
+        }
+
+        49.9% {
+          opacity: 0;
+        }
+
+        50%, 100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes flash {
+        0% {
+          opacity: 0;
+        }
+
+        49.9% {
+          opacity: 0;
+        }
+
+        50%, 100% {
+          opacity: 1;
+        }
+      }
+
+      @-webkit-keyframes show-content {
+        0% {
+          -webkit-transform: translateY(20em) translateZ(7.142em);
+                  transform: translateY(20em) translateZ(7.142em);
+          opacity: 0;
+        }
+
+        100% {
+          -webkit-transform: translateY(20em) translateZ(0);
+                  transform: translateY(20em) translateZ(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes show-content {
+        0% {
+          -webkit-transform: translateY(20em) translateZ(7.142em);
+                  transform: translateY(20em) translateZ(7.142em);
+          opacity: 0;
+        }
+
+        100% {
+          -webkit-transform: translateY(20em) translateZ(0);
+                  transform: translateY(20em) translateZ(0);
+          opacity: 1;
+        }
+      }
+
+      @-webkit-keyframes hide-content {
+        0% {
+          -webkit-transform: translateY(20em) translateZ(0);
+                  transform: translateY(20em) translateZ(0);
+          opacity: 1;
+        }
+
+        100% {
+          -webkit-transform: translateY(20em) translateZ(-300px);
+                  transform: translateY(20em) translateZ(-300px);
+          opacity: 0;
+        }
+      }
+
+      @keyframes hide-content {
+        0% {
+          -webkit-transform: translateY(20em) translateZ(0);
+                  transform: translateY(20em) translateZ(0);
+          opacity: 1;
+        }
+
+        100% {
+          -webkit-transform: translateY(20em) translateZ(-300px);
+                  transform: translateY(20em) translateZ(-300px);
+          opacity: 0;
+        }
+      }
+
+      /* Lastly, we'll set up the styles for the Twitter link
+       *
+       * The styles include an inline background image. Since we wanted to keep this to one request, the small png file has been `base64` encoded and passed into the `background-image` property directly. */
+
+      .twink {
+        line-height: 100%;
+        position: relative;
+        display: inline-block;
+        width: 32px;
+        height: 32px;
+        vertical-align: middle;
+        white-space: nowrap;
+        text-decoration: none;
+        text-indent: -900em;
+        color: #333;
+        border-radius: 50%;
+        background-color: #335;
+        background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAARBJREFUeNrsVtENgyAQ1cZ/2aCMwAiO0BEcwREcwRHsBLUbdISOYDegE1zP5JJSgsJRGj/KS15CVI4nd/egBIBiTxyKnZEFZAFZQJUwVoMUyDtyDp61GFECtvBGz5kb8pFCzrSIcLyXSA2fGFIKKEgA0EK9JWQEN8aUAk5WcE3PhOPvTTS+2BWjwEzUyAvySuM1tMb49k0RCiMNMVhNR6gPaGQf2Z5Pas+f+4ALD+SAnFL5gGJufeeLWTJvRIJcrg7ceknpizoLBkfuOLXQ+RZfsLUDinI3GYGWtjoGLH62WjD6LFAeo4nKO9cJxYbd2r0uuQcZpwgFOaIyakNTUU4h+ebWQL6SZQFZwH8IeAkwAG1ac5A+LEIlAAAAAElFTkSuQmCC);
+        background-repeat: no-repeat;
+        background-position: center center;
+      }
+    </style>
+    <style>
+      /* ## Inline fonts
+
+        Having embedded the CSS directly into the head of the document, we'll do the same with a Google web font. We embed the font in the same way we embedded the background image above.
+
+        The font is approximately 15KB, so creates a large block of embedded text. See you on the other side!
+
+      */
+
+      @font-face {
+        font-family: 'Open Sans Condensed';
+        font-style: normal;
+        font-weight: 300;
+        src: url(data:application/x-font-woff;charset=utf-8;base64,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);
+      }
+    </style>
+    <script>
+      /*
+        ## Modernizr
+        
+        In general it's better to place JavaScript at the end of the HTML, and only styles up here in the head. The reason being that JavaScript's execution stops the page for being painted. By placing the JavaScript at the end it helps the page render faster. One exception to this is the Modernizr script, which we place at the top as we would like it to run early and test the browser's capabilities.
+      */
+
+      /* Modernizr 2.7.1 (Custom Build) | MIT & BSD
+       * Build: http://modernizr.com/download/#-csstransforms3d-inlinesvg-cssclasses-teststyles-testprop-testallprops-prefixes-domprefixes
+       */
+      ;window.Modernizr=function(a,b,c){function A(a){j.cssText=a}function B(a,b){return A(m.join(a+";")+(b||""))}function C(a,b){return typeof a===b}function D(a,b){return!!~(""+a).indexOf(b)}function E(a,b){for(var d in a){var e=a[d];if(!D(e,"-")&&j[e]!==c)return b=="pfx"?e:!0}return!1}function F(a,b,d){for(var e in a){var f=b[a[e]];if(f!==c)return d===!1?a[e]:C(f,"function")?f.bind(d||b):f}return!1}function G(a,b,c){var d=a.charAt(0).toUpperCase()+a.slice(1),e=(a+" "+o.join(d+" ")+d).split(" ");return C(b,"string")||C(b,"undefined")?E(e,b):(e=(a+" "+p.join(d+" ")+d).split(" "),F(e,b,c))}var d="2.7.1",e={},f=!0,g=b.documentElement,h="modernizr",i=b.createElement(h),j=i.style,k,l={}.toString,m=" -webkit- -moz- -o- -ms- ".split(" "),n="Webkit Moz O ms",o=n.split(" "),p=n.toLowerCase().split(" "),q={svg:"http://www.w3.org/2000/svg"},r={},s={},t={},u=[],v=u.slice,w,x=function(a,c,d,e){var f,i,j,k,l=b.createElement("div"),m=b.body,n=m||b.createElement("body");if(parseInt(d,10))while(d--)j=b.createElement("div"),j.id=e?e[d]:h+(d+1),l.appendChild(j);return f=["&#173;",'<style id="s',h,'">',a,"</style>"].join(""),l.id=h,(m?l:n).innerHTML+=f,n.appendChild(l),m||(n.style.background="",n.style.overflow="hidden",k=g.style.overflow,g.style.overflow="hidden",g.appendChild(n)),i=c(l,a),m?l.parentNode.removeChild(l):(n.parentNode.removeChild(n),g.style.overflow=k),!!i},y={}.hasOwnProperty,z;!C(y,"undefined")&&!C(y.call,"undefined")?z=function(a,b){return y.call(a,b)}:z=function(a,b){return b in a&&C(a.constructor.prototype[b],"undefined")},Function.prototype.bind||(Function.prototype.bind=function(b){var c=this;if(typeof c!="function")throw new TypeError;var d=v.call(arguments,1),e=function(){if(this instanceof e){var a=function(){};a.prototype=c.prototype;var f=new a,g=c.apply(f,d.concat(v.call(arguments)));return Object(g)===g?g:f}return c.apply(b,d.concat(v.call(arguments)))};return e}),r.csstransforms3d=function(){var a=!!G("perspective");return a&&"webkitPerspective"in g.style&&x("@media (transform-3d),(-webkit-transform-3d){#modernizr{left:9px;position:absolute;height:3px;}}",function(b,c){a=b.offsetLeft===9&&b.offsetHeight===3}),a},r.inlinesvg=function(){var a=b.createElement("div");return a.innerHTML="<svg/>",(a.firstChild&&a.firstChild.namespaceURI)==q.svg};for(var H in r)z(r,H)&&(w=H.toLowerCase(),e[w]=r[H](),u.push((e[w]?"":"no-")+w));return e.addTest=function(a,b){if(typeof a=="object")for(var d in a)z(a,d)&&e.addTest(d,a[d]);else{a=a.toLowerCase();if(e[a]!==c)return e;b=typeof b=="function"?b():b,typeof f!="undefined"&&f&&(g.className+=" "+(b?"":"no-")+a),e[a]=b}return e},A(""),i=k=null,e._version=d,e._prefixes=m,e._domPrefixes=p,e._cssomPrefixes=o,e.testProp=function(a){return E([a])},e.testAllProps=G,e.testStyles=x,g.className=g.className.replace(/(^|\s)no-js(\s|$)/,"$1$2")+(f?" js "+u.join(" "):""),e}(this,this.document);
+    </script>
+  </head>
+  <body>
+    <!--
+      ## HTML
+
+      Now that we've embedded all the necessary styles, fonts and Modernizr script, it's time to supply HTML. 
+
+      The structure of the page has been set up so that if CSS is disabled, the important content is shown first. This should make the page accessible to a wider range of readers.
+    -->
+    <section class="pipes-container">
+      <div class="bg-pipes bg-pipe-1"></div>
+      <div class="bg-pipes bg-pipe-2"></div>
+      <div class="bg-pipes bg-pipe-3"></div>
+    </section>
+    <div class="fallback-stage"></div>
+    <div class="stage" id="stage">
+      <h1 class="logo"><a href="/">The Web Is...</a></h1>
+      <h2 class="subtitle">A <a href="http://besquare.me">Besquare</a> Event</h2>
+      <div class="content" id="content1">
+        <p>This October, something very special is coming to Cardiff, Wales.</p>
+        <p>Two days of web-based festivities you won't want to miss.</p>
+        </p>
+        <p>Find out more...</p>
+        <section class="register">
+          <form action="http://theweb.us6.list-manage.com/subscribe/post?u=ff829db8a5051034c3fa07f21&amp;id=25aa0695bf" method="post" id="mc-embedded-subscribe-form" name="mc-embedded-subscribe-form">
+            <input type="email" value="" name="EMAIL" placeholder="My email..."><br><input type="submit" value="Keep me up to date">
+            <div style="position: absolute; left: -5000px;"><input type="text" name="b_ff829db8a5051034c3fa07f21_d8669a6431" value=""></div>
+            <p><small>* no spam, we promise</small></p>
+          </form>
+          <p><a href="http://twitter.com/thewebis_" class="twink">@thewebis_ on Twitter</a></p>
+        </section>
+      </div>
+      <div class="positioning-start" id="scene-container">
+        <div class="mac">
+          <span class="base-left"></span>
+          <span class="base-right"></span>
+          <span class="base-front"></span>
+          <span class="left"></span>
+          <span class="right"></span>
+          <span class="top"></span>
+          <span class="front">
+            <span class="screen-container" id="screen-container">
+              <span class="screen" id="screen">
+                <pre class="smiley">
+
+
+
+
+
+
+
+
+                   &#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;
+                  &#9608;                   &#9608;
+                  &#9608;                   &#9608;
+                  &#9608;                   &#9608;
+                  &#9608;     &#9608;   &#9608;   &#9608;     &#9608;
+                  &#9608;     &#9608;   &#9608;   &#9608;     &#9608;
+                  &#9608;         &#9608;         &#9608;
+                  &#9608;        &#9608;&#9608;         &#9608;
+                  &#9608;      &#9608;     &#9608;      &#9608;
+                  &#9608;       &#9608;&#9608;&#9608;&#9608;&#9608;       &#9608;
+                  &#9608;                   &#9608;
+                  &#9608;                   &#9608;
+                  &#9608;                   &#9608;
+                   &#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;&#9608;
+                </pre>
+                <span class="sheen"></span>
+                <span class="welcome-message" id="welcome-message"></span>
+                <span class="subscribe-message" id="subscribe-message">
+                  <pre>Find out more...
+
+My email address is:
+
+<form action="http://theweb.us6.list-manage.com/subscribe/post?u=ff829db8a5051034c3fa07f21&amp;id=25aa0695bf" method="post" id="subscribe-form" name="mc-embedded-subscribe-form"><input type="email" value="" name="EMAIL" placeholder=""><div style="position: absolute; left: -5000px;"><input type="text" name="b_ff829db8a5051034c3fa07f21_d8669a6431" value=""></div><input type="submit" value="Sign up"></form>
+                  </pre>
+                </span>
+              </span>
+            </span>
+            <span class="front-logo"></span>
+            <span class="floppy"></span>
+          </span>
+          <span class="shadow"></span>
+        </div>
+      </div>
+    </div>
+    <!--
+      With the main HTML in place, one of the last things is to embed an SVG for the logo. This SVG is absolutely positioned so can be inserted last in the HTML.
+
+      Clicking this logo calls a JavaScript function, `showSource()`. We'll cover the JavaScript next.
+    -->
+  <div class="svg-logo">
+    <a href="#" onClick="showSource()">
+<svg version="1.1" baseProfile="full" xmlns="http://www.w3.org/2000/svg" width="120.399px" height="126.133px" viewBox="12.101 373.715 120.399 126.133">
+  <path d="M25.06,395.311c0,0.605,0,1.211,0,1.878c0.637,0,1.213,0,1.911,0c0,0.317,0,0.573,0,0.828c0,2.318-0.008,4.637,0.003,6.955
+  c0.007,1.665,0.989,3.029,2.568,3.317c1.161,0.212,2.364,0.155,3.522-0.43c-0.142-0.549-0.284-1.095-0.407-1.57
+  c-0.65,0.057-1.248,0.139-1.846,0.153c-0.768,0.018-1.354-0.466-1.478-1.226c-0.093-0.57-0.153-1.152-0.158-1.729
+  c-0.018-2.049-0.007-4.097-0.007-6.266c0.822,0,1.615,0.001,2.409,0c1.107-0.001,1.106-0.001,1.105-1.074c0-0.241,0-0.482,0-0.812
+  c-1.173,0-2.304,0-3.514,0c0-1.105,0.018-2.123-0.014-3.139c-0.007-0.22-0.194-0.435-0.428-0.699
+  c12.483-11.863,27.428-17.97,44.734-17.777c14.122,0.157,26.843,4.756,37.988,13.477c10.779,8.434,16.762,18.766,19.718,26.566
+  c-0.614-0.062-1.204-0.118-1.793-0.181c-0.263-0.028-0.525-0.101-0.787-0.102c-7.858-0.006-15.716-0.005-23.573-0.003
+  c-0.214,0-0.428,0.018-0.684,0.029c0,3.492,0,6.946,0,10.49c1.516,0,3.037,0,4.643,0c0,0.373,0,0.657,0,0.942
+  c0,11.445,0,22.89,0,34.335c0,2.729,1.712,4.428,4.459,4.428c5.052,0,10.103,0,15.154,0c0.265,0,0.531,0,0.919,0
+  c-3.745,7.797-8.755,14.517-15.161,20.187c-0.337-0.149-0.628-0.349-0.944-0.404c-1.12-0.193-2.174,0.839-1.905,1.951
+  c0.151,0.624-0.027,0.875-0.488,1.235c-3.117,2.428-6.451,4.51-9.966,6.296c-5.142,2.613-10.529,4.562-16.217,5.579
+  c-2.461,0.44-4.95,0.756-7.438,1.013c-1.902,0.196-3.829,0.346-5.735,0.269c-2.674-0.107-5.344-0.394-8.005-0.694
+  c-4.129-0.466-8.117-1.545-12.036-2.907c-5.536-1.925-10.687-4.606-15.478-7.964c-3.752-2.63-7.163-5.674-10.242-9.064
+  c-3.921-4.316-7.202-9.086-9.802-14.314c-0.141-0.283-0.272-0.57-0.399-0.859c-0.037-0.084-0.047-0.181-0.08-0.313
+  c2.836,0,5.637,0,8.556,0c2.347-9.563,5.414-18.937,7.308-28.1c0.574,4.47,2.253,9.204,3.495,14.043
+  c1.154,4.495,2.386,8.969,3.586,13.452c0.049,0.183,0.133,0.357,0.212,0.565c4.815,0,9.641,0,14.521,0
+  c0.501-1.972,1.009-3.94,1.501-5.912c2.02-8.092,4.031-16.187,6.054-24.278c0.643-2.573,1.308-5.141,1.976-7.708
+  c0.363-1.394,0.552-1.655,1.931-1.72c1.967-0.093,3.942-0.024,6.004-0.024c0,0.335,0,0.618,0,0.903c0,11.445,0,22.89,0,34.335
+  c0,2.733,1.709,4.434,4.453,4.434c8.346,0,16.692,0.001,25.038,0c2.597,0,4.333-1.737,4.334-4.333c0.001-3.246,0-6.491,0-9.737
+  c0-0.263,0-0.526,0-0.826c-3.771,0-7.469,0-11.275,0c0,0.845,0.002,1.689-0.001,2.533c-0.004,1.244-0.491,1.791-1.746,1.81
+  c-2.147,0.033-4.295,0.03-6.442,0.001c-1.122-0.015-1.718-0.505-1.745-1.604c-0.063-2.604-0.02-5.211-0.02-7.879
+  c4.783,0,9.507,0,14.288,0c0-3.535,0-7.006,0-10.541c-4.728,0-9.451,0-14.233,0c0-3.046,0-6.03,0-9.106c1.09,0,2.179,0,3.269,0
+  c1,0,2.001-0.009,3.002,0.002c1.466,0.016,2.009,0.566,2.017,2.02c0.004,0.752,0.001,1.504,0.001,2.305c3.756,0,7.452,0,11.236,0
+  c0.013-0.258,0.037-0.514,0.038-0.771c0.003-3.173,0.045-6.346-0.011-9.517c-0.049-2.795-1.386-4.576-4.594-4.579
+  c-13.983-0.01-27.966-0.025-41.949,0.013c-2.885,0.008-4.747,1.431-5.308,4.402c-0.807,4.273-1.798,8.512-2.698,12.768
+  c-0.906,4.28-1.819,8.559-2.68,12.848c-0.279,1.39-0.404,2.812-0.602,4.219c-0.012,0.085-0.054,0.166-0.152,0.452
+  c-0.161-0.909-0.255-1.624-0.418-2.322c-0.735-3.154-1.46-6.311-2.242-9.454c-1.728-6.946-3.488-13.885-5.237-20.826
+  c-0.071-0.28-0.166-0.553-0.242-0.832c-0.347-1.27-0.346-1.27-1.68-1.27c-2.684,0-5.369,0.013-8.053-0.011
+  c-0.52-0.005-0.742,0.122-0.879,0.67c-2.254,8.977-4.558,17.941-6.8,26.922c-0.563,2.256-0.947,4.556-1.417,6.835
+  c-0.006,0.031-0.064,0.051-0.164,0.124c-0.082-0.614-0.134-1.197-0.24-1.769c-0.407-2.199-0.806-4.4-1.254-6.591
+  c-0.785-3.836-1.601-7.666-2.408-11.498c-0.599-2.847-1.219-5.69-1.791-8.542c-0.085-0.424-0.041-0.918,0.089-1.334
+  c1.387-4.416,3.198-8.645,5.483-12.68c2.045-3.611,4.478-6.935,7.118-10.12c0.058-0.07,0.156-0.107,0.235-0.159
+  C25.07,395.323,25.06,395.311,25.06,395.311z M45.858,408.024c0-3.097,0.072-6.121-0.033-9.139
+  c-0.048-1.384-0.478-2.801-1.884-3.46c-1.677-0.786-3.346-0.549-4.885,0.482c-0.403,0.27-0.773,0.587-1.287,0.981
+  c0-2.629,0-5.079,0-7.533c-0.744,0-1.416,0-2.112,0c0,6.242,0,12.444,0,18.642c0.739,0,1.429,0,2.148,0
+  c0-2.864-0.005-5.667,0.008-8.471c0.001-0.272,0.029-0.652,0.2-0.796c0.681-0.569,1.361-1.205,2.156-1.558
+  c1.726-0.767,3.3,0.23,3.342,2.016c0.062,2.625,0.102,5.25,0.149,7.876c0.006,0.309,0.001,0.618,0.001,0.96
+  C44.42,408.024,45.093,408.024,45.858,408.024z M59.771,402.222c0-0.634-0.009-1.164,0.001-1.695
+  c0.059-2.975-1.822-5.801-5.442-5.518c-1.605,0.125-2.893,0.79-3.873,1.996c-1.541,1.895-1.809,4.109-1.379,6.443
+  c0.982,5.317,6.933,6.096,10.248,3.532c-0.266-0.471-0.534-0.947-0.802-1.422c-4.08,2.411-7.254,0.053-7.339-3.335
+  C54.007,402.222,56.828,402.222,59.771,402.222z M86.348,485.017c0.127,0.148,0.214,0.306,0.347,0.397
+  c2.073,1.43,4.345,1.89,6.744,1.103c2.859-0.938,3.331-4.434,1.374-5.989c-0.413-0.328-0.888-0.598-1.371-0.811
+  c-1.102-0.486-2.245-0.883-3.337-1.39c-0.624-0.29-1.036-0.807-0.901-1.581c0.122-0.697,0.58-1.109,1.208-1.32
+  c1.331-0.446,2.507,0.008,3.651,0.665c0.168,0.096,0.542,0.102,0.647-0.011c0.316-0.341,0.546-0.761,0.817-1.163
+  c-1.807-1.413-3.795-1.781-5.88-1.207c-2.529,0.698-3.294,3.184-2.212,5.023c0.509,0.865,1.374,1.267,2.238,1.654
+  c1.12,0.501,2.3,0.894,3.361,1.499c1.091,0.622,0.952,2.196-0.146,2.812c-0.808,0.453-1.689,0.548-2.528,0.284
+  c-1.021-0.322-1.986-0.819-3.032-1.265C87.055,484.079,86.71,484.537,86.348,485.017z M83.587,486.506c0-4.259,0-8.456,0-12.639
+  c-0.742,0-1.431,0-2.106,0c0,4.243,0,8.422,0,12.639C82.191,486.506,82.862,486.506,83.587,486.506z M99.945,486.836
+  c1.025,0.002,1.552-0.552,1.558-1.641c0.006-1.004-0.626-1.72-1.526-1.727c-0.981-0.008-1.709,0.748-1.696,1.761
+  C98.293,486.163,98.988,486.834,99.945,486.836z M108.092,485.133c-0.002-0.947-0.647-1.654-1.516-1.664
+  c-0.984-0.012-1.702,0.737-1.709,1.752c-0.005,0.789,0.749,1.729,1.731,1.636C107.578,486.762,108.095,486.248,108.092,485.133z
+   M82.517,471.022c0.953,0.002,1.568-0.554,1.56-1.41c-0.008-0.833-0.603-1.369-1.521-1.373c-1.031-0.004-1.55,0.453-1.553,1.365
+  C81,470.53,81.524,471.02,82.517,471.022z"/>
+<path d="M121.565,442.632c2.593,0.137,5.095,0.147,7.565,0.438c1.921,0.226,2.874,1.73,3.222,3.485
+  c0.336,1.692,0.129,3.363-0.96,4.824c-0.709,0.951-1.682,1.51-2.812,1.606c-1.714,0.146-3.442,0.15-5.165,0.164
+  c-1.199,0.01-1.824-0.533-1.839-1.659C121.54,448.616,121.565,445.742,121.565,442.632z"/>
+<path d="M121.598,432.802c0-2.966,0-5.833,0-8.68c1.704,0,3.373-0.013,5.042,0.009c0.428,0.005,0.859,0.096,1.282,0.182
+  c1.653,0.338,2.661,2.046,2.751,3.409c0.107,1.615-0.166,3.057-1.396,4.129c-0.534,0.465-1.303,0.864-1.99,0.909
+  C125.421,432.883,123.542,432.802,121.598,432.802z"/>
+<path d="M25.07,395.323c0.623-0.725,1.247-1.45,1.883-2.189c0.096,0.106,0.148,0.136,0.15,0.169
+  c0.093,2.041,0.092,2.041-2.044,2.008C25.06,395.311,25.07,395.323,25.07,395.323z"/>
+<path d="M51.166,400.704c0.09-2.113,1.606-3.818,3.43-3.921c1.885-0.106,2.804,1.015,3.194,3.921
+  C55.597,400.704,53.409,400.704,51.166,400.704z"/>
+    <animate attributeName="fill" dur="20s" values ="#cc3333; #308e36; #33cccc; #cc3333" repeatCount="indefinite" />
+  </svg>
+  <span class="hover-text">
+  <pre><code>&lt;!DOCTYPE html&gt;
+  &lt;<span style="color: #ED2068">head</span>&gt;
+    &lt;<span style="color: #ED2068">title</span>
+    &lt;<span style="color: #ED2068">meta</span> <span style="color: #65BC16">name</span>=<span style="color: ##DAD668">"viewport"</span>
+    &lt;<span style="color: #ED2068">meta</span> <span style="color: #65BC16">http-equiv</span>=<span style="color: ##DAD668">Content-Type"</span>
+  </code></pre>
+  </span>
+  </a>
+  </div>
+  <script type="text/javascript">
+    /*
+      ## Javascript
+    */
+    // Before working on the various parts, get some of the elements and attach them to variables to work on them
+    var welcomeMessage = document.getElementById("welcome-message");
+    var container = document.getElementById("scene-container");
+    var welcomeContainer = document.getElementById('welcome-message');
+    var subscribeContainer = document.getElementById('subscribe-message');
+    var subscribeform = document.getElementById('subscribe-form');
+    var content1 = document.getElementById('content1');
+
+    // Make the screen move forward when clicked
+    container.onclick = function(e) {
+      if (container.className === 'positioning-active') {
+        container.setAttribute("class", "positioning");
+        welcomeContainer.setAttribute("class", "welcome-message show");
+        subscribeContainer.setAttribute("class", "subscribe-message");
+      } else {
+        container.setAttribute("class", "positioning-active");
+        welcomeContainer.setAttribute("class", "welcome-message");
+        subscribeContainer.setAttribute("class", "subscribe-message show");
+        subscribeform.EMAIL.focus();
+      }
+    };
+
+    // Stop the screen reverting back when someone clicks the screen
+    subscribeContainer.onclick = function(e) {
+      event.stopPropagation();
+    }
+
+    // Check for small screen widths, and if so, adjust the intro animation
+    if (window.innerWidth < 481) {
+      welcomeMessageDelay = 2800;
+    } else {
+      welcomeMessageDelay = 9500;
+    }
+
+    // Show the welcome message after a delay (longer for desktop-width browsers)
+    window.setTimeout(function() {
+      welcomeContainer.setAttribute("class", "welcome-message show");
+      showMessage();
+    }, welcomeMessageDelay);
+
+    // Show the welcome message
+    function showMessage() {
+      var message = "This October, something very special is@coming to Cardiff, Wales.@@       Two days of web-based festivities  you won't want to miss.@@        Press here to find out more...";
+      var letters = message.split('');
+      displayText(message);
+    }
+
+    // Separate out the letters from the welcome message and display them one at a time
+    function displayText(message) {
+      var letters = message.split('');
+      var internalCallback = function() { 
+        letter = letters.shift();
+        if (letter !== undefined) {
+          var wait = Math.floor(Math.random() * 60) + 10;
+          if (letter === '@') {
+            letter = '<br>';
+            wait = 200;
+          }
+          welcomeContainer.innerHTML += letter;
+          window.setTimeout(internalCallback, wait);
+        }
+      };
+      var wait = Math.floor(Math.random() * 60) + 30;
+      window.setTimeout(internalCallback, wait);
+    };
+
+    // Show content as the user scrolls down the screen
+    var content1_show = false;
+    window.onscroll = function (event) {
+      if (window.pageYOffset > 500 && content1_show === false) {
+        container.setAttribute("class", "positioning");
+        welcomeContainer.setAttribute("class", "welcome-message show");
+        subscribeContainer.setAttribute("class", "subscribe-message");
+        content1.setAttribute("class", "content show");
+        content1_show = true;
+      } else if (window.pageYOffset < 300 && content1_show) {
+        content1.setAttribute("class", "content hide");
+        content1_show = false;
+      }
+    }
+
+    // Handy view-source script, from: http://stackoverflow.com/a/1815227
+    function showSource() {
+        var source = "<!DOCTYPE html>";
+        source += document.getElementsByTagName('html')[0].innerHTML;
+        source += "</html>";
+        //now we need to escape the html special chars, javascript has escape
+        //but this does not do what we want
+        source = source.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        //now we add <pre> tags to preserve whitespace
+        source = "<pre>"+source+"</pre>";
+        //now open the window and set the source as the content
+        sourceWindow = window.open('','Source of page','height=800,width=800,scrollbars=1,resizable=1');
+        sourceWindow.document.write(source);
+        sourceWindow.document.close(); //close the document for writing, not the window
+        //give source window focus
+        if(window.focus) sourceWindow.focus();
+    }
+
+    // Insert a favicon, from:
+    // http://stackoverflow.com/questions/5199902/isnt-it-silly-that-a-tiny-favicon-requires-yet-another-http-request-how-to-mak
+    var favIcon = "AAABAAIAICAAAAEAIACoEAAAJgAAABAQAAABACAAaAQAAM4QAAAoAAAAIAAAAEAAAAABACAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAA////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A/v7+AOfx5iHN4stCwNu+UsDbvlLN4stC5/HmIf7+/gD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD8/fwDw93BUH21eahGlkHrNo4w/zaOMP82jjD/No4w/zaOMP82jjD/RpZB6321eajD3cFQ/P38A////wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD9/v0Atta0YFGdTN42jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP9RnUzetta0YP3+/QD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A6fLoHmmqZME2jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/0qZReVUnk/bWqJV00uZRuVDlT3ugLd8p/T48w////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////ANTn0zhHl0LqNo4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/o8uge3GubLiVwpGLhruDnl6kWs9pqmTBh7yEm9Tn0zj///8A////AP///wD///8A////AP///wD///8A////AP///wDU59M4QZQ78zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP+fyJx9kMCMko2+ipQ5jzP6No4w/zaOMP82jjD/QZQ789Tn0zj///8A////AP///wD///8A////AP///wD///8A6fLoHkeXQuo2jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/5XDkoqiyp97jL6JmDeOMfw2jjD/No4w/zaOMP82jjD/R5dC6uny6B7///8A////AP///wD///8A////AP3+/QBpqmTBNo4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP85jzP6ZqhhxDaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/aapkwf3+/QD///8A////AP///wD///8Atta0YDaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zeOMf1PnErgNo4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/tta0YP///wD///8A////AP///wCEuYCcaqtlvWqrZb05jzP6No4w/zaOMP9XoFLUaqtlvWqrZb1YoVPSNo4w/zaOMP82jjD/No4w/WKmXclqq2W9aqtlvWqrZb1qq2W9aqtlvV+lWs02jjD9PpI582epY8Bqq2W9aqtlvWiqZMBwr226/f38A////wD///8A////AP///wD///8A////AGSnX8c2jjD/No4w/9vq2i////8A////AOLu4Sg2jjD/No4w/zaOMP91sXGv////AP///wD///8A////AP///wD///8A////AGmqZMGw0q5l////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8AmsaXgjaOMP9JmEPo/v7+AP///wD///8A////AEqZRec2jjD/No4w/4W6gZv///8A////AP///wD///8A////AP///wD///8AdrJyrL7avFD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDQ5M88No4w/3+3e6T///8A////AP///wD///8AfLV4pzaOMP82jjD/hbqBm////wD///8Aqc6mcVKdTt6At3yk////AP///wB2snKsvtq8UP///wD///8Ad7Jzs1SeT9u62Lha////AP///wD///8A////AP///wDq8+of////APv8+wVAkzrytdWzYP///wDq8+of////AP///wCv0axnNo4w/zaOMP+FuoGb////AP///wCVw5KLNo4w/zyRNvdNm0jgTZtI4D2SOPW+2rxQ////AP///wBbolbVNo4w/3y0eKj///8A////AP///wD///8A////AKLKn33///8A////AHSxcLLr8+oa////AKXMo3X6/PkH////AOLu4Sg2jjD/No4w/4W6gZv///8A////AN7s3S3A275TwNu+U53Im4M2jjD/No4w/77avFD///8A////AKvPqWuaxpd+4u7hJv///wD///8A////AP///wD///8AXqRZz+Xw5CT///8AyN/GTP///wD///8Abqxqu9Xn1Df///8A////AEqZReU2jjD/hbqBm////wD///8A////AP///wD///8Ay+LKRjaOMP82jjD/vtq8UP///wD///8A////AP///wD///8A+/z7Bejy6B7///8A////APj7+Ao6jzT6stOwZP///wD7/fsF////APv8+wY+kjnzrNCpbf///wD///8AfLV4pzaOMP+FuoGb////AP///wDg7d8oxN7CScTewkmfyZx7No4w/zaOMP++2rxQ////AP///wDV59Q11+jWM////wD///8A/f79AP///wD///8A0uXQOjaOMP9/t3ul////AP///wD///8A0uXQPDaOMP+BuH2j////AP///wCv0axnNo4w/4W6gZv///8A////AJXDkos2jjD/TZtI4FujV89YoVPSNo4w/77avFD///8A////AFuiVtU2jjD/0+bSOv///wD///8A////AP///wCnzaRxNo4w/0yaR+X///8A////AP///wCfyJx7No4w/1afUdf///8A////AObw5SJgpVzLnceaff///wD///8Aq8+pcGCkW87I4MdH////APL38RFUnk/czOLKQv///wD///8AfbV5rGqrZcDq8+ka////AP///wD///8A////AH62eqc2jjD/No4w/+Pv4ib///8A////AGysaLs2jjD/N44x/fT48w////8A////AP///wD///8A////AP///wD///8A////AP///wD///8A8vfxEcbexUn///8A////AP///wD///8A////AP///wD///8A////AP///wD4+/cJTJpG4zaOMP82jjD/sNKuZ////wD7/PsGPpI59TaOMP82jjD/vdq7Vf///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDe7N0rxt7FSf///wD///8A////AP///wD///8A/v7+APH38RT///8A////AMTew002jjD/No4w/zaOMP9GlkDtWaFU11WeUNw2jjD/No4w/zaOMP85jzP6WaFU0lujV85bo1fOW6NXzlujV85bo1fOW6NXzlujV85bo1fOW6NXzkKUPPBQnUvcW6NXzlujV85bo1fOW6NXzluiVtBGlkDtw93BUP///wD///8A/P38A1GdTN42jjD/No4w/0KVPfA3jjH9N44x/DeOMfw3jjH8Oo80+kKUPPA2jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/1GdTN78/fwD////AP///wD///8Atta0YDaOMP9gpVvJn8mce2mqZL91sXKyaKpkvXq0dq6qzqdxgbh9o0CTOvI2jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/tta0YP///wD///8A////AP///wD9/v0AaapkwXOwb69jp17FX6ZcyXWxcrJoqmS9pMyieZzHmoGDuH+hXqRZzjaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/2mqZMH9/v0A////AP///wD///8A////AP///wDp8ugepMuhdJ3Hmn1lqGDFrtGrbqfNpXJmqGHGocmee5XDkopUnk/ZNo4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP9Hl0Lq6fLoHv///wD///8A////AP///wD///8A////AP///wD1+fUPba1puGCmXMl4snSxR5dC6jaOMP89kTf2Q5U97jaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/QZQ789Tn0zj///8A////AP///wD///8A////AP///wD///8A////AP///wDU59M4XaRYz1egUtc2jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/0eXQurU59M4////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wDp8ugeaapkwTaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP9pqmTB6fLoHv///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD9/v0Atta0YFGdTN42jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP9RnUzetta0YP3+/QD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A/P38A8PdwVB9tXmoRpZB6zaOMP82jjD/No4w/zaOMP82jjD/No4w/0aWQet9tXmow93BUPz9/AP///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD+/v4A5/HmIc3iy0LA275SwNu+Us3iy0Ln8eYh/v7+AP///wD///8A////AP///wD///8A////AP///wD///8A////AP///wD///8A////AP//////4Af//4AB//4AAH/8ABA/+AAQH/AACA/gAAAH4AAAB8AAAAP48P7/+PD+//zw5uf9+MDj/fj4/++4/P/vuPz/55zA5+ed7ufHH///xx///8AAAAPAAAAD5CAAB+BAAAf9oAAP+AAAH/wAAD/+AAB//4AB///gB///////KAAAABAAAAAgAAAAAQAgAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAP///wD///8A////AP///wD9/v0Az+TOPpjElIN9tnmkfbZ5pJjElIPP5M4+/f79AP///wD///8A////AP///wD///8A////AP///wDU5tI4XaRYzzaOMP82jjD/No4w/zaOMP86kDT4RpZB6maoYcXc69su////AP///wD///8A////AP///wC52LdZOpA0+DaOMP82jjD/No4w/zaOMP82jjD/bKxovYm8hZpUnk/ZV6BS1rnYt1n///8A////AP///wDU5tI4OpA0+DaOMP82jjD/No4w/zaOMP82jjD/No4w/1qiVdJmqGHENo4w/TaOMP86kDT41ObSOP///wD///8AdrJyrkSWPu02jjD/SplF40yaRuM2jjD/No4w/U2bSOBVn1DWT5xK3j+TOfJElj7rT5xK3nGvbbX///8A////AP///wC/271SOpA0+Pb69gz3+vcKOpA0+FihU9L///8A////AP///wC41rZa2+raLv///wD///8A////AP///wD5/PkH8/jyD2usZ735/PkH////AGaoYcJdpFjN////AHGvbbaCuH6fgLd8oN/t3iiz1LFica5stv///wD///8AwNu+U/f69wnK4chGxN7CTPP48w+XxJSDXaRYzf///wDn8eYfyeDIRzaOMP/f7d4o6vPqGd7s3Sn5+/kH////AI6/io7M4spC/f79AI/AjI3K4chEyuHIQ12kWM3///8AnMeZfoS5gJw/kznz3+3eKMziykK21rVa////AP///wBjpl7FmcWWgv///wBepFnNn8mdefn7+Ae/271S////AMHcwE/x9/ARv9u9UvL48g/f7d4r1efUNf///wDu9e4VOpA0+FigU9Sqz6duN44x/FmhVNOs0KpnrtGrZ67Rq2eu0atnrtGrZ46/i5Cu0atnrtGrZ6fNpHDr9OsZ/f79AF2kWM9fpVrNU55O2lSeT9lpqmTAOY8z+jaOMP82jjD/No4w/zaOMP82jjD/No4w/zaOMP9dpFjP/f79AP///wDU5tI4hbqBmXmzdayGu4OblsOSikiXQuk2jjD/No4w/zaOMP82jjD/No4w/zaOMP86kDT41ObSOP///wD///8A////AM7jzD9jpl7IOpA0+DqQNPg2jjD/No4w/zaOMP82jjD/No4w/zaOMP86kDT4udi3Wf///wD///8A////AP///wD///8A1ObSOF2kWM82jjD/No4w/zaOMP82jjD/No4w/zaOMP9dpFjP1ObSOP///wD///8A////AP///wD///8A////AP///wD9/v0Az+TOPpjElIN9tnmkfbZ5pJjElIPP5M4+/f79AP///wD///8A////AP///wD8PwAA8A8AAOAHAADAAwAAgAEAAOz/AADsjQAA/O8AALbPAACX/wAAk+8AAIABAADAAwAA4AcAAPAPAAD8PwAA";
+    var docHead = document.getElementsByTagName('head')[0];       
+    var newLink = document.createElement('link');
+    newLink.rel = 'shortcut icon';
+    newLink.href = 'data:image/png;base64,'+favIcon;
+    docHead.appendChild(newLink);
+
+    // Finally, we track the visit
+    !function(g,s,q,r,d){r=g[r]=g[r]||function(){(r.q=r.q||[]).push(arguments)};d=s.createElement(q);q=s.getElementsByTagName(q)[0];d.src='//d1l6p2sc9645hc.cloudfront.net/tracker.js';q.parentNode.insertBefore(d,q)}(window,document,'script','_gs');
+    _gs('GSN-582181-H');
+  </script>
+  </body>
+</html>

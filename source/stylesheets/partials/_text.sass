@@ -1,0 +1,149 @@
+body
+  background-color: $background-colour
+  font-size: 16px
+  line-height: 1
+  font-family: 'Open Sans Condensed', sans-serif
+  opacity: 1
+  animation: fade-in 2s forwards
+
+  &.bgfix
+    background-color: #028e9b
+
+h2.subtitle
+  position: fixed
+  right: 2em
+  top: 1em
+  color: #444
+  font-size: 1em
+  text-transform: uppercase
+  transition: all 0.25s
+  animation: fade-in 3s forwards
+  opacity: 0
+  animation-delay: 2s
+  transform: translateZ(0.1em)
+  letter-spacing: 0
+
+  a
+    color: #222
+    font-weight: bold
+
+p
+  font-size: 1.5em
+  line-height: 1.25em
+  margin: 0.5em 0
+  font-weight: normal
+
+strong
+  font-weight: bold
+
+a
+  color: #22a
+  text-decoration: none
+
+  &:hover
+    color: #55f
+
+h2, h3
+  font-size: 4em
+  font-weight bold
+  margin: 0.25em 0
+
+h2
+  letter-spacing: -2px
+
+h3
+  font-size: 2.25em
+
+p.button
+  padding-top: 1em
+
+  a
+    display: inline-block
+    padding: 0.75em 1.5em
+    border: 1px solid $highlight-colour
+    border-radius: $border-radius
+    transition: all 0.25s ease-out
+    font-weight: bold
+
+    &.white
+      color: #fff
+      border-color: #fff
+
+    &:hover
+      background-color: $highlight-colour
+      color: #fff
+      transition: all 0.25s ease-out
+
+    &.white:hover
+      color: #028e9b
+      border-color: #028e9b
+      background-color: #fff
+
+    &.dark
+      color: #fff
+      background-color: #09a
+
+.content form
+  padding: 0.25em 0
+
+  input
+    font-weight: normal
+    font-family: 'Open Sans Condensed', sans-serif
+    font-size: 1.5em
+    border: 2px solid #558
+    background-color: #eee
+    padding: 0.25em 0.5em
+    border-radius: 0.25em
+    margin: 0.25em 0
+    outline: none
+    width: 14em
+
+    &:focus
+      box-shadow: 0 0 0 2px #f90
+
+  input[type=submit]
+    display: inline-block
+    padding: 0.25em 1em
+    border: 1px solid $highlight-colour
+    border-radius: $border-radius
+    transition: all 0.25s ease-out
+    font-weight: bold
+    width: auto
+    cursor: pointer
+
+    &.white
+      color: #fff
+      border-color: #fff
+
+    &:hover
+      background-color: $highlight-colour
+      color: #fff
+      transition: all 0.25s ease-out
+
+    &.white:hover
+      color: #028e9b
+      border-color: #028e9b
+      background-color: #fff
+
+  p
+    margin-top: 0
+
+form.internal
+  text-align: center
+
+  label
+    display: none
+
+  input
+    background: #fff
+    border: 2px solid #fff
+    color: #333
+
+  input[type=submit]
+    background-color: transparent
+    border: 2px solid #fff
+    color: #fff
+
+    &:hover
+      background-color: #fff
+      color: #000

@@ -1,0 +1,61 @@
+.modal
+  background: #fff
+  background: rgba(255,255,255,0.98)
+  color: #000
+  font-size: 14px
+  width: 90%
+  text-align: left
+  max-width: 800px
+  padding: 2em
+  position: absolute
+  top: 50%
+  left: 50%
+  transform: translate3d(-50%, -50%, 0)
+  transition: transform .5s cubic-bezier(.97,-0.47,.28,1.4), opacity .5s cubic-bezier(.97,-0.47,.28,1.4)
+  z-index: 1000
+
+  &.hidden
+    transform: translate3d(-50%, -150%, -100px) scale(0.1)
+    opacity: 0
+
+  .close
+    background: rgba(255,255,255,0.8)
+    border: 0 solid transparent
+    border-radius: 50%
+    border: 2px solid rgba(0,0,0,0.5)
+    cursor: pointer
+    color: #888
+    font-size: 24px
+    width: 2em
+    height: 2em
+    position: absolute
+    top: 1em
+    right: 1em
+    transition: all .25s ease-out
+
+    &:hover
+      background: #fff
+
+    &:focus
+      outline: none
+
+.modal
+  > section
+    display: table-cell
+    width: 50%
+    padding: 0 1em
+
+  ul
+    padding: 0
+
+  li
+    font-size: 15px
+    list-style: none
+    line-height: 1.25em
+    padding: 5px 0
+
+  ul.large
+    li
+      font-size: 18px
+
+

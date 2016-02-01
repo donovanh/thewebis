@@ -1,0 +1,358 @@
+header, section.moreinfo
+  position: absolute
+  top: 0
+  width: 100%
+
+  a
+    color: #fff
+    font-weight: bold
+
+  nav
+    position: fixed
+    top: 0
+    width: 100%
+    background: rgba(0,0,0,0.4)
+    text-align: center
+    z-index: 50
+
+    ul
+      width: auto
+      margin: 0 auto
+      padding: 0
+      transition: 0.25s all ease-out
+
+      li
+        list-style: none
+        display: inline-block
+        padding: 0 2em
+        text-align: center
+        transition: 0.25s all ease-out
+
+        a
+          color: #eee
+          font-size: 1.5em
+          padding: 0.1em 0.5em
+          transition: all 0.25s ease-out
+          font-weight: normal
+
+          &:hover
+            color: #fff
+            background: rgba(0,0,0,0.2)
+            border-radius: 0.1em
+
+      &.shifted
+        transform: translateX(0.5em)
+        transition: 0.25s all ease-out
+
+        li.shiftleft
+          margin-right: 4em
+          transition: 0.25s all ease-out
+
+        li.shiftright
+          margin-left: 3em
+          transition: 0.25s all ease-out
+
+section.moreinfo
+  min-height: 60em !important
+
+  .centered
+    width: 95%
+    padding-top: 4em
+
+  .sponsors
+    margin-bottom: 5em
+    img
+      display: inline-block
+      margin: 0 0.5em
+      width: 200px
+  nav
+    position: relative
+    padding-top: 2em
+    background: none
+
+    ul
+      font-size: 16px
+      li
+        padding: 0
+        width: auto
+        a
+          font-weight: normal
+          line-height: 2em
+      &.secondary
+        li
+          font-size: 12px
+
+      &.copyright
+        li
+          padding-top: 1em
+
+header
+  nav
+    padding: 1em 0
+
+.content
+  font-size: 18px
+  z-index: 10
+  position: relative
+
+  > section
+    color: $text-colour
+    width: 100%
+    text-align: center
+    padding: 2em 0
+    transform-origin: 50% 0 0
+    position: relative
+    min-height: 40em
+
+    .centered
+      width: 60%
+      max-width: 40em
+      position: absolute
+      top: 50%
+      left: 50%
+      transform: translate(-50%, -50%)
+
+.wrap
+  max-width: 760px
+  margin: 0 auto
+
+  &.wide
+    max-width: 960px
+
+section.what
+  background: #09a
+  background: rgba(2,142,155,1) url(/images/homebg_blue.jpg) no-repeat
+  background-size: cover
+  color: #fff
+
+  h2
+    padding-top: 0.25em
+    animation: text-fade-up 1.5s forwards ease-out
+    opacity: 0
+    animation-delay: 2s
+
+  p
+    animation: text-fade-up 1s forwards ease-out
+    animation-delay: 2s
+    opacity: 0
+
+  .site-links
+    a
+      display: inline-block
+      color: #fff
+      font-size: 0.75em
+      padding: 0 1em
+
+section.who
+  background: #ffad00
+  background: rgba(255, 200, 0, 0.9)
+  min-height: auto
+  padding-bottom: 4em
+
+  p
+    max-width: 26em
+    margin: 0 auto
+    padding: 0.25em 0
+
+section.where
+  position: relative
+  background: url(/images/map.png) no-repeat center
+  background-size: cover
+  background-position: center
+
+  .centered
+    margin-top: 8.5em
+    background: #fff
+    background: rgba(255,255,255,0.8)
+    padding: 1em
+    border: 2px solid white
+
+section.workshops
+  position: relative
+  background: #c43833
+  background: rgba(196,56,51,0.8) url(/images/workshop.jpg) no-repeat
+  background-size: cover
+  background-position: center
+  color: #fff
+  z-index: 10
+
+  .centered
+    width: 100%
+    max-width: 100%
+
+  .workshop
+    background-color: #fff
+    background-size: cover
+    background-position: center
+    display: inline-block
+    min-height: 20em
+    width: 28%
+    max-width: 23em
+    margin: 2%
+    vertical-align: top
+    position: relative
+
+    &:hover
+      .workshop-title
+        background: #09a
+        color: #fff !important
+
+    > a
+      position: absolute
+      top: 0
+      right: 0
+      bottom: 0
+      left: 0
+
+  .workshop-title
+    font-size: 18px
+    background: rgba(255,255,255,0.9)
+    position: absolute
+    bottom: -0.5em
+    left: -0.5em
+    right: -0.5em
+    text-align: left
+    line-height: 1.25em
+    padding: 1em
+    transition: all 0.25s ease-out
+    color: #000
+
+    .author
+      display: block
+      padding-bottom: 0.25em
+      font-size: 1.5em
+      font-weight: bold
+
+
+section.how
+  background: #09a
+  background: rgba(2,142,155,0.8)
+  color: #fff
+  padding-top: 0
+  .centered
+    padding-bottom: 5em
+
+section.moreinfo
+  padding-bottom: 14em
+  background: #222
+  color: #eee
+
+.pipes-container
+  position: fixed
+  width: 100%
+  overflow: hidden
+  height: 68em
+  z-index: 1
+  top: 0
+  opacity: 0
+  animation: fade-in 1s forwards
+  animation-delay: 2s
+
+.bg-pipes
+  border: 0.5em solid desaturate(rgba(255,0,0,1), 40%)
+  border-radius: 1.5em
+  top: 6em
+  left: 15em
+  height: 40em
+  width: 300%
+  position: absolute
+
+  &:before
+    content: ""
+    display: block
+    position: absolute
+    width: 100%
+    height: 39em
+    border: 0.5em solid desaturate(rgba(10,180,20,1), 40%)
+    border-radius: 1em 2em 2em 1em
+
+  &:after
+    content: ""
+    display: block
+    position: absolute
+    width: 100%
+    height: 38em
+    margin: 0.5em -0.5em -0.5em 0.5em
+    border: 0.5em solid desaturate(rgba(0,255,255,1), 40%)
+    border-radius: 0.5em 1.5em 1.5em 0.5em
+
+.bg-pipe-2
+  left: -220%
+  top: 16em
+
+.bg-pipe-3
+  top: 42em
+  left: 10em
+
+header.internal
+
+  h1.logo
+    text-indent: -9000px
+
+section.internal
+  background: #09a
+  background: rgba(2,142,155,1)
+  text-align: left
+  padding-top: 6em
+  padding-bottom: 13em
+  color: #fff
+  font-size: 16px
+
+  h1
+    font-size: 3em
+    padding: 1em 0 1em
+    text-align: center
+    font-weight: bold
+
+  p
+    margin: 0.5em 0 1.25em
+
+  a
+    color: #fff
+    font-weight: bold
+
+.twink
+  background-color: #000
+  background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAARBJREFUeNrsVtENgyAQ1cZ/2aCMwAiO0BEcwREcwRHsBLUbdISOYDegE1zP5JJSgsJRGj/KS15CVI4nd/egBIBiTxyKnZEFZAFZQJUwVoMUyDtyDp61GFECtvBGz5kb8pFCzrSIcLyXSA2fGFIKKEgA0EK9JWQEN8aUAk5WcE3PhOPvTTS+2BWjwEzUyAvySuM1tMb49k0RCiMNMVhNR6gPaGQf2Z5Pas+f+4ALD+SAnFL5gGJufeeLWTJvRIJcrg7ceknpizoLBkfuOLXQ+RZfsLUDinI3GYGWtjoGLH62WjD6LFAeo4nKO9cJxYbd2r0uuQcZpwgFOaIyakNTUU4h+ebWQL6SZQFZwH8IeAkwAG1ac5A+LEIlAAAAAElFTkSuQmCC)
+  width: 32px
+  height: 32px
+  background-repeat: no-repeat
+  background-position: center center
+  border-radius: 50%
+  text-indent: -900em
+  color: #333
+  text-decoration: none
+  line-height: 100%
+  white-space: nowrap
+  display: inline-block
+  position: relative
+  vertical-align: middle
+  transition: all 0.25s ease-out
+
+  &:hover
+    box-shadow: 0 0 1em rgba(200,200,255,0.2)
+    transition: all 0.25s ease-out
+    transform: rotateZ(360deg)
+
+.clearfix
+  &:after
+    content: "."
+    display: block
+    clear: both
+    visibility: hidden
+    line-height: 0
+    height: 0
+  display: inline-block
+
+.center-aligned
+  text-align: center !important
+
+html[xmlns] .clearfix
+  display: block
+
+* html .clearfix
+  height: 1%
+
+.no-csstransforms3d
+  .positioning, .bg-pipes
+    display: none
