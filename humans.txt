@@ -1,0 +1,12 @@
+/* TEAM */
+	Main man: Craig Lockwood
+	Twitter: @craiginwales
+
+	Web design / development: Donovan Hutchinson
+	Twitter: @donovanh
+
+/* SITE */
+	Language: English
+	Doctype: HTML5
+	IDE: Sublime Text
+  Tools: Git, Middleman, Bitbucket
